@@ -1,0 +1,21 @@
+{
+  "name": "train-around-me-puppeteer",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx --env-file=.env src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer-real-browser": "^1.2.31",
+    "tsx": "^4.16.5"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^7.0.4",
+    "typescript": "^5.5.4"
+  }
+}
