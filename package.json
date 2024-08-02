@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsx --env-file=.env src/index.ts",
-    "cron:get:station": "tsx --env-file=.env src/cron/getStations.ts"
+    "cron:get:stations": "tsx --env-file=.env src/cron/getStations.ts",
+    "cron:get:geostation": "tsx --env-file=.env src/cron/getGeoStations.ts"
   },
   "author": "",
   "license": "ISC",

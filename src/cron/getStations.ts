@@ -1,6 +1,6 @@
 import { parse } from 'csv-parse';
 import * as fs from 'fs/promises';
-import Station from 'station/station';
+import Station from '@src/station/station';
 
 const _STATIONS_CSV_FILE = "https://raw.githubusercontent.com/trainline-eu/stations/master/stations.csv";
 

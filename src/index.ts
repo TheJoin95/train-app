@@ -1,8 +1,8 @@
 // @ts-ignore
 import { connect } from "puppeteer-real-browser";
-import { type Browser, type Page, connect as connectMaster } from "puppeteer";
+import { type Browser, type Page } from "puppeteer";
 import * as fs from "fs/promises";
-import { TravelData } from "./omio/extractor";
+import { TravelData } from "@src/omio/extractor";
 
 type StationsMap = {
   [type: string]: string;
