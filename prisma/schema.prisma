@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type StationsLocation {
+  coordinates Float[]
+  type        String
+}
+
+model stations {
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  country      String
+  distanceInKm Float
+  duration     Float?
+  location     StationsLocation
+  name         String
+  sncfId       String?
+  timeZone     String
+}
