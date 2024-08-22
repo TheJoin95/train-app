@@ -1,17 +1,27 @@
+type StationsLocation = {
+    coordinates: number[],
+    type: string
+  }
 export default class Station {
-    id: number;
     name: string;
-    latitude: number;
-    longitude: number;
     country: string;
     timeZone: string;
+    distanceInKm: number;
+    location: StationsLocation;
+    duration: number | null;
 
-    constructor(id: number, name: string, latitude: number, longitude: number, country: string, timeZone: string) {
-        this.id = id;
+    constructor(name: string, latitude: number, longitude: number, country: string, timeZone: string, distanceInKm: number, duration: number | null = null) {
         this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.country = country;
         this.timeZone = timeZone;
+        this.distanceInKm = distanceInKm;
+        this.location = {
+            type: 'Point',
+            coordinates: [
+                longitude,
+                latitude,
+            ],
+        };
+        this.duration = duration;
     }
 }

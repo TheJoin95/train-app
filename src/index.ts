@@ -37,6 +37,14 @@ const STATIONS: StationsMap = {
   arrival: "Strasbourg",
 };
 
+const payload = {
+  stations: STATIONS,
+  departure: {
+    day: 27,
+    month: 9
+  }
+};
+
 connect({
   headless: 'auto',
   turnstile: true,
@@ -51,8 +59,6 @@ connect({
 
   await setStation(page, "departure");
   await setStation(page, "arrival");
-
-  // 10 - November
   await setTime(page, "Departure", 27, 9);
 
   await page.locator(Locators.searchButton).click();
