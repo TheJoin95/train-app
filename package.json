@@ -3,16 +3,18 @@
   "type": "module",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsx --env-file=.env src/index.ts",
+    "start": "tsx --env-file=.env src/scraper.ts",
     "cron:get:stations": "tsx --env-file=.env src/cron/getStations.ts",
-    "cron:get:durations": "tsx --env-file=.env src/cron/getDurationStations.ts"
+    "cron:get:durations": "tsx --env-file=.env src/cron/getDurationStations.ts",
+    "producer": "tsx --env-file=.env src/queue/producer.ts",
+    "consumer": "tsx --env-file=.env src/queue/get_route_price_worker.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@cloudamqp/amqp-client": "^3.1.1",
     "@prisma/client": "^5.17.0",
     "csv-parse": "^5.5.6",
     "puppeteer-real-browser": "^1.2.31",
