@@ -12,6 +12,22 @@ type StationsLocation {
   type        String
 }
 
+model prices {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  arrivalStation   String
+  arrivalTime      DateTime @db.Date
+  companyId        BigInt
+  departureStation String
+  departureTime    DateTime @db.Date
+  duration         BigInt
+  mode             String
+  originalPrice    BigInt
+  price            BigInt
+  status           String
+  stops            BigInt
+  ticketsLeft      BigInt
+}
+
 model stations {
   id           String           @id @default(auto()) @map("_id") @db.ObjectId
   country      String
@@ -21,4 +37,6 @@ model stations {
   name         String
   sncfId       String?
   timeZone     String
+
+  @@index([location], map: "location_2dsphere")
 }
