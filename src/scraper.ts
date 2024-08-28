@@ -3,10 +3,7 @@ import { connect } from "puppeteer-real-browser";
 import { type Browser, type Page } from "puppeteer";
 import * as fs from "fs/promises";
 import { TravelData } from "@src/omio/extractor";
-
-type StationsMap = {
-  [type: string]: string;
-};
+import type { JourneyPayload, StationsMap } from "./types";
 
 const Locators: Record<string, string> = {
   checkBoxToggle: '[data-e2e="searchCheckbox"] .react-toggle',
@@ -32,54 +29,45 @@ class DynamicLocators {
   }
 }
 
-const STATIONS: StationsMap = {
-  departure: "Paris",
-  arrival: "Strasbourg",
-};
+export default async function getJourneyPrices(payload: JourneyPayload): Promise<TravelData> {
+  return connect({
+    headless: 'auto',
+    turnstile: true,
+  }).then(async (response: any) => {
+    const { page, browser }: { page: Page; browser: Browser } = response;
+  
+    // @ts-ignore
+    await page.goto(process.env.OMIO_BASE_URL, { waitUntil: "domcontentloaded" });
+  
+    await checkCookieBanner(page);
+    await page.click(Locators.checkBoxToggle);
+  
+    await setStation(page, "departure", payload.stations);
+    await setStation(page, "arrival", payload.stations);
+    await setTime(page, "Departure", payload.departure.day, payload.departure.month);
+  
+    await page.locator(Locators.searchButton).click();
+  
+    const result = await page.waitForResponse(
+      async (response) => {
+        if (
+          response.url().includes(process.env.OMIO_RESULT_URL) &&
+          response.status() === 200
+        )
+          return Object.keys((await response.json()).outbounds).length > 0;
+      },
+      { timeout: 5000 }
+    );
+  
+    await fs.writeFile(
+      "logs/response.json",
+      JSON.stringify(TravelData.fromJSON(JSON.stringify(await result.json())))
+    );
+    await browser.close();
+    return TravelData.fromJSON(JSON.stringify(await result.json()));
+  });
+}
 
-const payload = {
-  stations: STATIONS,
-  departure: {
-    day: 27,
-    month: 9
-  }
-};
-
-connect({
-  headless: 'auto',
-  turnstile: true,
-}).then(async (response: any) => {
-  const { page, browser }: { page: Page; browser: Browser } = response;
-
-  // @ts-ignore
-  await page.goto(process.env.OMIO_BASE_URL, { waitUntil: "domcontentloaded" });
-
-  await checkCookieBanner(page);
-  await page.click(Locators.checkBoxToggle);
-
-  await setStation(page, "departure");
-  await setStation(page, "arrival");
-  await setTime(page, "Departure", 27, 9);
-
-  await page.locator(Locators.searchButton).click();
-
-  const result = await page.waitForResponse(
-    (response) => {
-      if (
-        response.url().includes(process.env.OMIO_RESULT_URL) &&
-        response.status() === 200
-      )
-        return response;
-    },
-    { timeout: 5000 }
-  );
-
-  await fs.writeFile(
-    "logs/response.json",
-    JSON.stringify(TravelData.fromJSON(JSON.stringify(await result.json())))
-  );
-  await browser.close();
-});
 
 const checkCookieBanner = async (page: Page) => {
   if (await page.locator(Locators.gdprButton)) {
@@ -87,10 +75,10 @@ const checkCookieBanner = async (page: Page) => {
   }
 };
 
-const setStation = async (page: Page, mode: string) => {
+const setStation = async (page: Page, mode: string, stations: StationsMap) => {
   const stationLoc = await page.locator(DynamicLocators.stationLocator(mode));
   await stationLoc.click();
-  await stationLoc.fill(STATIONS[mode]);
+  await stationLoc.fill(stations[mode]);
   await page.evaluate(() => setTimeout(() => false), 200);
   await selectFirstElementInStationList(page, mode);
 };
