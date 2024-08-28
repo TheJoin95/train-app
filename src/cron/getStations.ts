@@ -8,7 +8,7 @@ const _STATIONS_CSV_FILE =
 
 const PARIS_LAT = 48.8857803;
 const PARIS_LNG = 2.3821279;
-const MAX_DISTANCE_FROM_ME = 900;
+const MAX_DISTANCE_FROM_ME = 1100;
 const prisma = new PrismaClient();
 
 async function processStations(): Promise<void> {

@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const PARIS_SNCF_ID = 'admin:fr:75056';
 
 const getDurationForStations = async () => {
-    const stations = await prisma.stations.findMany();
+    const stations = await prisma.stations.findMany({ 'where': { 'duration': null } });
 
     for (let station of stations) {
         console.log('Processing %s', station.name);
@@ -32,7 +32,6 @@ const getDurationForStations = async () => {
             const responseJourneyJson = await journey.json();
             if (responseJourneyJson?.journeys !== undefined) {
                 const duration = responseJourneyJson?.journeys[0].durations.total;
-        
                 await prisma.stations.update({ data: { sncfId: stationSncfId, duration: duration }, where: { id: station.id } })
             }
         }
