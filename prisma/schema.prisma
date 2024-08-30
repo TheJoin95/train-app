@@ -12,6 +12,31 @@ type StationsLocation {
   type        String
 }
 
+type TimesInbound {
+  date     DateTime             @db.Date
+  stations TimesInboundStations
+}
+
+type TimesInboundStations {
+  arrival   String
+  departure String
+}
+
+type TimesOutbound {
+  date     DateTime              @db.Date
+  stations TimesOutboundStations
+}
+
+type TimesOutboundStations {
+  arrival   String
+  departure String
+}
+
+type TimesPreferences {
+  inbound  String
+  outbound String
+}
+
 model prices {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
   arrivalStation   String
@@ -39,4 +64,11 @@ model stations {
   timeZone     String
 
   @@index([location], map: "location_2dsphere")
+}
+
+model times {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  inbound     TimesInbound
+  outbound    TimesOutbound
+  preferences TimesPreferences?
 }
