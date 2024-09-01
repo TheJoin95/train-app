@@ -38,12 +38,13 @@ type TimesPreferences {
 }
 
 model prices {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
   arrivalStation   String
-  arrivalTime      DateTime @db.Date
+  arrivalTime      DateTime  @db.Date
   companyId        BigInt
+  creationDate     DateTime? @db.Date
   departureStation String
-  departureTime    DateTime @db.Date
+  departureTime    DateTime  @db.Date
   duration         BigInt
   mode             String
   originalPrice    BigInt

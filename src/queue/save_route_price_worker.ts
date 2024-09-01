@@ -40,6 +40,7 @@ async function startConsumer() {
             originalPrice: outbound.originalPrice,
             status: outbound.status,
             ticketsLeft: outbound.ticketsLeft,
+            creationDate: new Date(),
           });
         });
 
