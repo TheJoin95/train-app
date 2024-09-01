@@ -79,7 +79,7 @@ export const getPricesFromTimeId = async (req: http.IncomingMessage, res: http.S
       arrivalStation: time.outbound.stations.outbound,
       departureTime: {gte: new Date(time.inbound.date.toISOString().split('T')[0] + ' 00:00'), lte: new Date(time.inbound.date.toISOString().split('T')[0] + ' 24:00')},
     },
-    orderBy: { id: -1 }
+    orderBy: { id: 'desc' }
   });
 
   const outboundJourneys = await prisma.prices.findMany({
@@ -88,7 +88,7 @@ export const getPricesFromTimeId = async (req: http.IncomingMessage, res: http.S
       arrivalStation: time.inbound.stations.outbound,
       departureTime: {gte: new Date(time.outbound.date.toISOString().split('T')[0] + ' 00:00'), lte: new Date(time.outbound.date.toISOString().split('T')[0] + ' 24:00')},
     },
-    orderBy: { id: -1 }
+    orderBy: { id: 'desc' }
   });
 
   await prisma.$disconnect()
@@ -96,3 +96,12 @@ export const getPricesFromTimeId = async (req: http.IncomingMessage, res: http.S
   res.writeHead(200, 'Content-type: application/json');
   res.end(JSON.stringify({"success": true, data: {inbound: inboundJourneys, outbound: outboundJourneys}}));
 };
+
+export const getTimes = async (req: http.IncomingMessage, res: http.ServerResponse) => {
+  const prisma = new PrismaClient();
+  const times: Time[] = await prisma.times.findMany({ orderBy: { id: 'desc' } });
+  await prisma.$disconnect()
+
+  res.writeHead(200, 'Content-type: application/json');
+  res.end(JSON.stringify({"success": true, data: times}));
+}

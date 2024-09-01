@@ -1,6 +1,6 @@
 import * as http from "http";
 import * as url from "url";
-import { addTime, deleteTime, getPricesFromTimeId } from "./times";
+import { addTime, deleteTime, getPricesFromTimeId, getTimes } from "./times";
 
 const PORT = 3000;
 const CONTENT_TYPE_JSON: Record<string, string> = { "Content-Type": "application/json" };
@@ -23,6 +23,8 @@ const routeRequests = async (req: http.IncomingMessage, res: http.ServerResponse
     await addTime(req, res);
   } else if (req.method === "DELETE" && parsedUrl.pathname.match(/time\/([0-9]+)/) !== null) {
     await deleteTime(req, res);
+  } else if (req.method === "GET" && parsedUrl.pathname.match(/times/) !== null) {
+    await getTimes(req, res);
   } else {
     // Return a 404 response if the method is not allowed
     sendResponse(res, 404, CONTENT_TYPE_JSON, { error: "Method not allowed" });
@@ -36,5 +38,5 @@ const sendResponse = (res: http.ServerResponse, statusCode: number, contentType:
 
 // Start the server and listen on the specified port
 server.listen(PORT, () => {
-  console.log(`Product server listening on ${PORT}`);
+  console.log(`Server listening on ${PORT}`);
 });
