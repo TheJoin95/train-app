@@ -11,6 +11,7 @@
     "producer": "tsx --env-file=.env src/cron/producer.ts",
     "worker:get-route-price": "tsx --env-file=.env src/queue/get_route_price_worker.ts",
     "worker:save-route-price": "tsx --env-file=.env src/queue/save_route_price_worker.ts",
+    "worker:send-notification": "tsx --env-file=.env src/queue/send_notification.ts",
     "api:run-server": "tsx --env-file=.env src/api/index.ts"
   },
   "author": "",
@@ -19,6 +20,7 @@
     "@cloudamqp/amqp-client": "^3.1.1",
     "@prisma/client": "^5.17.0",
     "csv-parse": "^5.5.6",
+    "nodemailer": "^6.9.14",
     "puppeteer-real-browser": "^1.2.31",
     "tsx": "^4.16.5"
   },
