@@ -5,6 +5,7 @@ const cloudAMQPURL = process.env.CLOUDAMQP_URL || '';
 export const QUEUES = {
   QUEUE_GET_ROUTE_PRICE: process.env.QUEUE_GET_ROUTE_PRICE || '',
   QUEUE_SAVE_ROUTE_PRICE: 'save_route_price',
+  QUEUE_SEND_NOTIFICATION: 'send_notification',
 };
 
 export default async function sendToQueue(queue: string, body: object, shouldExit: boolean = false) {

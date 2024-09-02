@@ -1,6 +1,6 @@
 import { AMQPClient } from '@cloudamqp/amqp-client'
 import { JourneyPayload } from '@src/types';
-import { QUEUES } from './sender';
+import sendToQueue, { QUEUES } from './sender';
 import { PrismaClient } from "@prisma/client";
 import type { TravelData } from '@src/omio/extractor';
 
@@ -26,7 +26,20 @@ async function startConsumer() {
       
       if (journeyPrices && payload) {
         const prices: any = [];
+        let sentNotification = false;
         Object.values(journeyPrices.outbounds).map((outbound) => {
+          let sendNotification = false;
+          if ((outbound.price / 100) <= 30 && parseInt(outbound.duration) / 60 > 3) {
+            sendNotification = true;
+          } else if ((outbound.price / 100) <= 20 && parseInt(outbound.duration) / 60 > 1) {
+            sendNotification = true;
+          }
+
+          if (sendNotification && !sentNotification) {
+            sentNotification = true;
+            sendToQueue(QUEUES.QUEUE_SEND_NOTIFICATION, {travelData: prices});
+          }
+
           prices.push({
             companyId: parseInt(outbound.companyId),
             duration: parseInt(outbound.duration),
