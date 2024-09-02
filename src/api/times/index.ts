@@ -42,7 +42,7 @@ export const addTime = async (req: http.IncomingMessage, res: http.ServerRespons
  * @param res 
  */
 export const deleteTime = async (req: http.IncomingMessage, res: http.ServerResponse) => {
-  const timeId = parseInt(req.url.match(/time\/([0-9]+)/)[1]);
+  const timeId = req.url.match(/times\/([\w]+)/)[1];
 
   if (!timeId) {
     res.writeHead(400, 'Content-type: application/json');
@@ -66,17 +66,23 @@ export const deleteTime = async (req: http.IncomingMessage, res: http.ServerResp
  * @param res 
  */
 export const getPricesFromTimeId = async (req: http.IncomingMessage, res: http.ServerResponse) => {
-  const timeId = req.url.match(/time\/([0-9]+)\/prices/)[1];
+  const timeId = req.url.match(/times\/([\w]+)\/prices/)[1];
 
   const prisma = new PrismaClient();
   const time: Time = await prisma.times.findFirst({where: { id: timeId }});
+
+  if (!time) {
+    res.writeHead(400, 'Content-type: application/json');
+    res.end(JSON.stringify({"error": 'timeid not found'}));
+    return;
+  }
 
   // TODO: add filters like > or < datetime in departure/arrival, price, mode and duration
 
   const inboundJourneys = await prisma.prices.findMany({
     where: {
       departureStation: time.inbound.stations.departure,
-      arrivalStation: time.outbound.stations.outbound,
+      arrivalStation: time.inbound.stations.arrival,
       departureTime: {gte: new Date(time.inbound.date.toISOString().split('T')[0] + ' 00:00'), lte: new Date(time.inbound.date.toISOString().split('T')[0] + ' 24:00')},
     },
     orderBy: { id: 'desc' }
@@ -85,7 +91,7 @@ export const getPricesFromTimeId = async (req: http.IncomingMessage, res: http.S
   const outboundJourneys = await prisma.prices.findMany({
     where: {
       departureStation: time.outbound.stations.departure,
-      arrivalStation: time.inbound.stations.outbound,
+      arrivalStation: time.outbound.stations.arrival,
       departureTime: {gte: new Date(time.outbound.date.toISOString().split('T')[0] + ' 00:00'), lte: new Date(time.outbound.date.toISOString().split('T')[0] + ' 24:00')},
     },
     orderBy: { id: 'desc' }
@@ -105,3 +111,7 @@ export const getTimes = async (req: http.IncomingMessage, res: http.ServerRespon
   res.writeHead(200, 'Content-type: application/json');
   res.end(JSON.stringify({"success": true, data: times}));
 }
+
+BigInt.prototype["toJSON"] = function () {
+  return this.toString();
+};
