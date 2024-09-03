@@ -6,6 +6,9 @@ import { TravelData } from "@src/omio/extractor";
 import type { JourneyPayload, StationsMap } from "./types";
 
 const Locators: Record<string, string> = {
+  qualiModal: '#qual_ol',
+  qualiFirstChoice: '.qual_ol_ans_item:nth-of-type(1)',
+  qualiSubmitBtn: '#qual_ol_send',
   checkBoxToggle: '[data-e2e="searchCheckbox"] .react-toggle',
   searchButton: '[data-e2e="buttonSearch"]',
   gdprButton: '[data-element="gdpr-banner-button-accept"]',
@@ -35,6 +38,8 @@ export default async function getJourneyPrices(payload: JourneyPayload): Promise
     turnstile: true,
   }).then(async (response: any) => {
     const { page, browser }: { page: Page; browser: Browser } = response;
+
+    await page.setDefaultTimeout(15 * 1000);
   
     // @ts-ignore
     await page.goto(process.env.OMIO_BASE_URL, { waitUntil: "domcontentloaded" });
@@ -68,10 +73,17 @@ export default async function getJourneyPrices(payload: JourneyPayload): Promise
   });
 }
 
-
 const checkCookieBanner = async (page: Page) => {
-  if (await page.locator(Locators.gdprButton)) {
-    await page.locator(Locators.gdprButton).click();
+  try {
+    if (await page.locator(Locators.gdprButton)) {
+      await page.locator(Locators.gdprButton).click();
+    }
+
+    if (await page.locator(Locators.qualiModal)) {
+      await page.evaluate(() => document.querySelector(Locators.qualiModal).style.display = 'none');
+    }
+  } catch(e) {
+    console.log(e);
   }
 };
 

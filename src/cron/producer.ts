@@ -13,7 +13,7 @@ async function startProducer() {
         formattedTimes.push({
           stations: time[mode].stations,
           departure: {
-            day: time[mode].date.getDay() + 1,
+            day: time[mode].date.getDate(),
             month: time[mode].date.getMonth() + 1,
           },
         });

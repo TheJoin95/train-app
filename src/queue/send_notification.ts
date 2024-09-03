@@ -4,33 +4,11 @@ import { createTransport } from 'nodemailer';
 
 const lavinmqUrl = process.env.CLOUDAMQP_URL || '';
 
-
-
-var transporter = createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PWD,
-    }
-  });
-  
-  var mailOptions = {
-    from: 'miki.lombi@gmail.com',
-    to: 'miki.lombi@gmail.com',
-    subject: `Notification from train App`,
-    text: `ciao`
-  };
-  
-  transporter.sendMail(mailOptions, function(error, info){
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
-  });
-
-
-
+function toReadableDurationTime(minutes: number) {
+    const m = minutes % 60;
+    const h = (minutes-m)/60;
+    return (h < 10 ? "0" : "") + h.toString() + ":" + (m < 10 ? "0" : "") + m.toString();
+}
 
 async function startConsumer() {
   //Setup a connection to the LavinMQ server
@@ -41,13 +19,15 @@ async function startConsumer() {
   console.log("[✅] Connection over channel established");
   console.log("[❎] Waiting for messages. To exit press CTRL+C ");
 
-  const q = await channel.queue(QUEUES.QUEUE_SAVE_ROUTE_PRICE, {durable: true});
+  const q = await channel.queue(QUEUES.QUEUE_SEND_NOTIFICATION, {durable: true});
   let counter = 0;
 
   await q.subscribe({noAck: true}, async (msg) => {
     try {
-      const travelData = JSON.parse(msg.bodyToString() || '');
+      const { travelData } = JSON.parse(msg.bodyToString() || '');
       console.log(`[📤] Message received (${++counter})`, msg.bodyToString());
+      
+      console.log(travelData);
       
       var transporter = createTransport({
         service: 'gmail',
@@ -61,7 +41,7 @@ async function startConsumer() {
         from: 'miki.lombi@gmail.com',
         to: 'miki.lombi@gmail.com',
         subject: `Notification from train App - €${travelData.price / 100} - ${travelData.departureStation} -> ${travelData.arrivalStation}`,
-        text: `${travelData.mode} with a duration of ${travelData.duration / 60}h departing ${travelData.departureTime}, arriving ${travelData.arrivalTime} in ${travelData.stops} stops, ${travelData.ticketsLeft} ticket left`
+        text: `${travelData.mode} with a duration of ${toReadableDurationTime(travelData.duration)}h departing ${travelData.departureTime}, arriving ${travelData.arrivalTime} in ${travelData.stops} stops, ${travelData.ticketsLeft} ticket left`
       };
       
       transporter.sendMail(mailOptions, function(error, info){
@@ -86,4 +66,4 @@ async function startConsumer() {
   });
 }
 
-// startConsumer().catch(console.error);
+startConsumer().catch(console.error);

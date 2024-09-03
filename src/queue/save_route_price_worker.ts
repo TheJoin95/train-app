@@ -26,21 +26,9 @@ async function startConsumer() {
       
       if (journeyPrices && payload) {
         const prices: any = [];
-        let sentNotification = false;
+        let sendNotification = null;
         Object.values(journeyPrices.outbounds).map((outbound) => {
-          let sendNotification = false;
-          if ((outbound.price / 100) <= 30 && parseInt(outbound.duration) / 60 > 3) {
-            sendNotification = true;
-          } else if ((outbound.price / 100) <= 20 && parseInt(outbound.duration) / 60 > 1) {
-            sendNotification = true;
-          }
-
-          if (sendNotification && !sentNotification) {
-            sentNotification = true;
-            sendToQueue(QUEUES.QUEUE_SEND_NOTIFICATION, {travelData: prices});
-          }
-
-          prices.push({
+          const priceData = {
             companyId: parseInt(outbound.companyId),
             duration: parseInt(outbound.duration),
             departureStation: payload.stations.departure,
@@ -54,8 +42,23 @@ async function startConsumer() {
             status: outbound.status,
             ticketsLeft: outbound.ticketsLeft,
             creationDate: new Date(),
-          });
+          };
+
+          if ((
+            (outbound.price / 100) <= 30 && outbound.mode == 'train' && parseInt(outbound.duration) / 60 > 3)
+            || (
+              (outbound.price / 100) <= 20 && outbound.mode == 'train' && parseInt(outbound.duration) / 60 > 1
+            )
+          ) {
+            sendNotification = priceData;
+          }
+
+          prices.push(priceData);
         });
+
+        if (sendNotification) {
+          await sendToQueue(QUEUES.QUEUE_SEND_NOTIFICATION, {travelData: sendNotification});
+        }
 
         await prisma.prices.createMany({ data: prices });
       }
