@@ -45,9 +45,9 @@ async function startConsumer() {
           };
 
           if ((
-            (outbound.price / 100) <= 30 && outbound.mode == 'train' && parseInt(outbound.duration) / 60 > 3)
+            (outbound.price / 100) <= 30 && !outbound.stops && outbound.mode == 'train' && parseInt(outbound.duration) / 60 > 3)
             || (
-              (outbound.price / 100) <= 20 && outbound.mode == 'train' && parseInt(outbound.duration) / 60 > 1
+              (outbound.price / 100) <= 20 && !outbound.stops && outbound.mode == 'train' && parseInt(outbound.duration) / 60 > 1
             )
           ) {
             sendNotification = priceData;
