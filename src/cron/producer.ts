@@ -17,6 +17,19 @@ async function startProducer() {
             month: time[mode].date.getMonth() + 1,
           },
         });
+        
+
+        // Search for the next saturday as well
+        const saturdayDayWeek = 6;
+        const d = new Date();
+        const nextSaturday = (d.getDate() + (((saturdayDayWeek + 7 - d.getDay()) % 7) || 7));
+        formattedTimes.push({
+          stations: time[mode].stations,
+          departure: {
+            day: nextSaturday,
+            month: d.getMonth() + 1,
+          }
+        })
       })
     });
 
