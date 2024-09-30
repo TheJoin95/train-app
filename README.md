@@ -43,7 +43,6 @@ This project is a scraper designed to pull data from [Omio.com](https://www.omio
   ```bash
   MONGODB_USER
   MONGODB_PASSWORD
-  SNCF_API_TOKEN
   DATABASE_URL
   CLOUDAMQP_URL
   GMAIL_USER
@@ -52,9 +51,11 @@ This project is a scraper designed to pull data from [Omio.com](https://www.omio
 
   I personally created a MongoDB instance with MongoDB Atlas and used CloudAMQP to create the LavinMQ.
   Of course I've used my personal gmail for notification.
+
 4. Sync your Prisma with your DB
+
 5. Add some record in the times collection such as like:
-  ```bash
+  ```json
   {
   "outbound": {
     "stations": {
@@ -77,9 +78,8 @@ This project is a scraper designed to pull data from [Omio.com](https://www.omio
 }
   ```
 6. Run `./run-producer.sh`
+
 7. Run `./run-queue.sh`
-
-
 
 # License
 
